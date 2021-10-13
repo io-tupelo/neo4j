@@ -1,0 +1,7 @@
+2021-9-2 Alan Thompson
+
+  ; ***** WARNING! Just including this dependency takes ~75 sec of startup to run tests *****
+  ; ***** Even if unused & unreferenced!  Must be a massive Singleton or something. *****
+  ; [org.neo4j.test/neo4j-harness "4.0.0"]  ;
+
+

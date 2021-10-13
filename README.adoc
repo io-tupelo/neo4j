@@ -1,0 +1,164 @@
+
+= Neo4J Demo in Clojure
+
+A simple demo accessing Neo4J using the `gorillalabs/neo4j-clj` library.
+
+== Installation
+
+This project assumes you have already installed Neo4J Desktop (Enterprise Edition). It is availble
+for free for local use.  When you download the installer, be sure to copy the Activition Code and
+save it.  You will need the Activation Code during the installation process.
+
+Since the Neo4J Desktop is free to use for development, I have not played around with the
+open source Docker version of Neo4J.
+
+== Environment
+
+The unit tests in this repo work against a locally running instance of Neo4j Desktop.  For some
+unknown reason, it doesn't work right running against a basic DB in the Neo4j Aura cloud.
+
+== Configuration after installation
+
+Note that in the Neo4j Desktop browser, there are three (3) different entities to consider:
+
+1. the Project
+2. the DBMS
+3. the DB
+
+Keep in mind that a project can have multiple DBMS's, and a DBMS can have multiple DB's.
+
+For our purposes, create the following configuration in Neo4j Desktop:
+
+- Click the top-left "project" icon, then the `+ New` button to create a new project. Name it 
+  "Demo Project", for example.
+
+- In the top-right corner, click the "+ Add" button to add a "Local DBMS".  Change the default name
+  to "Unit Test DBMS", if desired.  For development purposes, set the password to "secret". Then,
+  click the blue "Create" button.  
+
+- Click on the DBMS name under the Project name in the Neo4j Desktop window to highlight it, then
+  click on the "Plugins" tab in the RHS panel. Select "APOC" and install to the DB.
+
+- Click on the DBMS name under the Project name in the Neo4j Desktop window to highlight it, then
+  click the green "Start" button so the DB is active (not just the neo4j desktop).  If you make any
+  changes to the DB config you'll need to click the "restart" to make then take effect.
+
+- The DBMS will create 2 DB's, "system" and "neo4j". We accept the default DB name "neo4j" in the
+  DBMS.  If you click the "Details" tab on the RHS panel, you should see the Bolt protocol running
+  on port 7687.
+
+- We depend on the DB name "neo4j", the password "secret", and the port 7687 being correct. 
+  These creds must be correct or the neo4j driver can't connect to the DB (it will fail auth).
+
+=== Verify you have Java, Clojure, and Leiningen set up correctly
+
+Try the following commands, and make sure you get similar output:
+
+```bash
+> java --version
+java 13 2019-09-17
+Java(TM) SE Runtime Environment (build 13+33)
+Java HotSpot(TM) 64-Bit Server VM (build 13+33, mixed mode, sharing)
+
+> lein --version
+Leiningen 2.9.1 on Java 13 Java HotSpot(TM) 64-Bit Server VM
+```
+
+== Run the Unit Tests
+
+I do this so much I have some bash aliases:
+
+```bash
+alias lct=" time (lein do clean, test)"
+alias lctr="time (lein do clean, test-refresh)"
+```
+
+The first one `lct` is generic, the 2nd one `lctr` is for use with the lein-test-refresh plugin.
+
+== Running Unit Tests - Plain
+
+Just type
+
+```bash
+> lct   # or `lein clean ; lein test`
+```
+
+with result:
+
+```pre
+  -----------------------------------
+     Clojure 1.10.3    Java 15.0.2
+  -----------------------------------
+
+  lein test tst.demo.core
+  Creating session...
+  Getting Neo4j version info
+  Getting APOC version info
+    *** APOC not installed ***
+
+  Ran 2 tests containing 4 assertions.
+  0 failures, 0 errors.
+  ( lein do clean, test; )  30.19s user 0.87s system 320% cpu 9.698 total
+```
+
+The message "*** APOC not installed ***" shows that we have not installed the free APOC library of
+functions for Neo4J.
+We want to install APOC. The APOC library is free and very useful, so we normally want to have it available.
+
+=== Install the APOC library
+
+In the Neo4j Desktop window, highlight your project in the left-hand
+nav pane..  Then click near the green "ACTIVE" label, which will open the "Manage" screen on the RHS of the screen.
+Click on Plugins -> APOC -> Install and Restart.  After the DB has restarted, re-run the tests.
+
+```pre
+  > lct
+  2021-07-15T16:34:45.646307497 INFO Driver - Direct driver instance 643411416 created for server address localhost:7687
+
+  lein test _bootstrap
+
+  -----------------------------------
+     Clojure 1.10.3    Java 15.0.2
+  -----------------------------------
+
+  lein test tst.demo.core
+  Creating session...
+  Getting Neo4j version info
+  Getting APOC version info
+    found APOC library
+
+  Ran 2 tests containing 6 assertions.
+  ( lein do clean, test; )  32.61s user 0.85s system 292% cpu 11.452 total
+```
+
+Notice that this time it found the APOC library.
+
+== Code Structure
+
+All interesting code is in the NS `tst.demo.core`, under the `test` directory.  I like this naming structure better then
+the `-test` suffix as it doesn't mess with the filename, and there is no conflict between hyphens "core-test"
+vs underscores "core_test.clj".
+
+== Keeping Dependency Versions Up-To-Date
+
+This project includes the `lein-ancient` plugin, which will tell you if any of your dependency
+libraries are out of date. I have an alias:
+
+```bash
+alias laca="lein ancient check :all"
+```
+
+which will give you a list of version updates you should make, or just
+
+```pre
+all artifacts are up-to-date.
+```
+
+if you are already up-to-date on everything.
+
+== License
+
+Copyright © 2021  Alan Thompson
+
+Distributed under the link:https://www.eclipse.org/legal/epl-v10.html[Eclipse Public License], the same as Clojure.
+
