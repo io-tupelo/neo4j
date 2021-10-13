@@ -5,7 +5,7 @@ A simple demo accessing Neo4J using the `gorillalabs/neo4j-clj` library.
 
 == Installation
 
-This project assumes you have already installed Neo4J Desktop (Enterprise Edition). It is availble
+This project assumes you have already installed Neo4J Desktop (Enterprise Edition). It is available
 for free for local use.  When you download the installer, be sure to copy the Activition Code and
 save it.  You will need the Activation Code during the installation process.
 
