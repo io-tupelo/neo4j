@@ -39,9 +39,9 @@
    Either way, you can optioninally pass a map of options:
 
   `:logging`   - a Neo4j logging configuration, e.g. (ConsoleLogging. Level/FINEST)"
-  ([uri user password] (get-driver uri user password nil))
-  ([uri user password options]
-   (let [auth   (AuthTokens/basic user password)
+  ([uri user pass] (get-driver uri user pass nil))
+  ([uri user pass options]
+   (let [auth   (AuthTokens/basic user pass)
          config (config options)
          driver (GraphDatabase/driver ^URI uri ^AuthToken auth ^Config config)]
      driver))

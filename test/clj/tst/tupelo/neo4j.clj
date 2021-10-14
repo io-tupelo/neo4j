@@ -7,7 +7,7 @@
     ))
 
 (dotest
-  (neo4j/with-driver config/neo4j-uri config/neo4j-user config/neo4j-password ; uri/username/password
+  (neo4j/with-driver config/neo4j-uri config/neo4j-username config/neo4j-password ; uri/username/password
 
     (neo4j/with-session
       (let [vinfo (neo4j/info-map)]

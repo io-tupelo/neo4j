@@ -8,7 +8,7 @@
     [tupelo.schema :as tsk]))
 
 (dotest   ; -focus
-  (neo4j/with-driver config/neo4j-uri config/neo4j-user config/neo4j-password  ; URI/username/password
+  (neo4j/with-driver config/neo4j-uri config/neo4j-username config/neo4j-password  ; URI/username/password
 
     ; Create a constraint, then an index & compare
     (neo4j/with-session
