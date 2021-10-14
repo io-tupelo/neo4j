@@ -7,58 +7,59 @@
     ))
 
 (dotest
-  (neo4j/with-driver config/neo4j-uri config/neo4j-username config/neo4j-password ; uri/username/password
+  (discarding-system-err ; prevents display of Neo4j DB log messages in terminal
+    (neo4j/with-driver config/neo4j-uri config/neo4j-username config/neo4j-password ; uri/username/password
 
-    (neo4j/with-session
-      (let [vinfo (neo4j/info-map)]
-        ; sample vinfo:  {:name "Neo4j Kernel" :version "4.2-aura" :edition "enterprise"}
-        ; sample vinfo:  {:name "Neo4j Kernel" :version "4.3.3" :edition "enterprise"}
-        (with-map-vals vinfo [name version edition]
-          (is= name "Neo4j Kernel")
-          (is= edition "enterprise")
-          (is (str/increasing-or-equal? "4.2" version))))
-      (is (str/increasing-or-equal? "4.2" (neo4j/neo4j-version)))
-      (is (neo4j/apoc-installed?)) ; verify APOC is present
-      (is (str/increasing-or-equal? "4.2" (neo4j/apoc-version))))
+      (neo4j/with-session
+        (let [vinfo (neo4j/info-map)]
+          ; sample vinfo:  {:name "Neo4j Kernel" :version "4.2-aura" :edition "enterprise"}
+          ; sample vinfo:  {:name "Neo4j Kernel" :version "4.3.3" :edition "enterprise"}
+          (with-map-vals vinfo [name version edition]
+            (is= name "Neo4j Kernel")
+            (is= edition "enterprise")
+            (is (str/increasing-or-equal? "4.2" version))))
+        (is (str/increasing-or-equal? "4.2" (neo4j/neo4j-version)))
+        (is (neo4j/apoc-installed?)) ; verify APOC is present
+        (is (str/increasing-or-equal? "4.2" (neo4j/apoc-version))))
 
-    (neo4j/with-session
-      (neo4j/drop-extraneous-dbs!)
+      (neo4j/with-session
+        (neo4j/drop-extraneous-dbs!)
 
-      ; "system" db is always present.  "neo4j" db is default DB name
-      (is-set= (neo4j/db-names-all) #{"system" "neo4j"})
+        ; "system" db is always present.  "neo4j" db is default DB name
+        (is-set= (neo4j/db-names-all) #{"system" "neo4j"})
 
-      (neo4j/run "create or replace database neo4j") ; drop/recreate default db
-      (neo4j/run "create or replace database SPRINGFIELD") ; make a new DB
+        (neo4j/run "create or replace database neo4j") ; drop/recreate default db
+        (neo4j/run "create or replace database SPRINGFIELD") ; make a new DB
 
-      ; NOTE: Dot `.` is legal a char in a DB name.
-      (neo4j/run "create or replace database some.hierarchical.db.name")
+        ; NOTE: Dot `.` is legal a char in a DB name.
+        (neo4j/run "create or replace database some.hierarchical.db.name")
 
-      ; NOTE: Underscore `_` & hyphen `-` are illegal chars in DB name
-      (throws? (neo4j/run "create or replace database SPRING-FIELD"))
-      (throws? (neo4j/run "create or replace database SPRING_FIELD"))
+        ; NOTE: Underscore `_` & hyphen `-` are illegal chars in DB name
+        (throws? (neo4j/run "create or replace database SPRING-FIELD"))
+        (throws? (neo4j/run "create or replace database SPRING_FIELD"))
 
-      (is-set= (neo4j/db-names-all) #{"system" "neo4j" "springfield" "some.hierarchical.db.name"}) ; NOTE:  all lowercase
+        (is-set= (neo4j/db-names-all) #{"system" "neo4j" "springfield" "some.hierarchical.db.name"}) ; NOTE:  all lowercase
 
-      ; use default db "neo4j"
-      (neo4j/run "CREATE (u:Jedi $Hero)  return u as padawan"
-        {:Hero {:first-name "Luke" :last-name "Skywalker"}})
-      (is= (neo4j/run "match (n) return n as Jedi ")
-        [{:Jedi {:first-name "Luke", :last-name "Skywalker"}}])
+        ; use default db "neo4j"
+        (neo4j/run "CREATE (u:Jedi $Hero)  return u as padawan"
+          {:Hero {:first-name "Luke" :last-name "Skywalker"}})
+        (is= (neo4j/run "match (n) return n as Jedi ")
+          [{:Jedi {:first-name "Luke", :last-name "Skywalker"}}])
 
-      ; use "springfield" db (DB name always coerced to lowercase by neo4j)
-      (is= (only ; CamelCase DB name works
-             (neo4j/run "use SpringField
+        ; use "springfield" db (DB name always coerced to lowercase by neo4j)
+        (is= (only ; CamelCase DB name works
+               (neo4j/run "use SpringField
                           create (p:Person $Resident) return p as Duffer" ; `as Duffer` => returned map key
-               {:Resident {:first-name "Homer" :last-name "Simpson"}}))
-        {:Duffer {:first-name "Homer", :last-name "Simpson"}})
+                 {:Resident {:first-name "Homer" :last-name "Simpson"}}))
+          {:Duffer {:first-name "Homer", :last-name "Simpson"}})
 
-      ; SCREAMINGCASE DB name works
-      (is= (neo4j/run "use SPRINGFIELD
+        ; SCREAMINGCASE DB name works
+        (is= (neo4j/run "use SPRINGFIELD
                         match (n) return n as Dummy")
-        [{:Dummy {:first-name "Homer", :last-name "Simpson"}}])
+          [{:Dummy {:first-name "Homer", :last-name "Simpson"}}])
 
-      (neo4j/run "drop database SpringField if exists")
-      )))
+        (neo4j/run "drop database SpringField if exists")
+        ))))
 
 (comment
   (neo4j/delete-all-nodes!)

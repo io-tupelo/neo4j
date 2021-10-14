@@ -138,7 +138,7 @@
 (s/defn drop-extraneous-dbs! :- [s/Str]
   []
   (let [drop-db-names (set/difference (set (db-names-all)) core-db-names)]
-    (doseq [db-name (spyx drop-db-names)]
+    (doseq [db-name drop-db-names]
       (run (format "drop database %s if exists" db-name)))))
 
 ;-----------------------------------------------------------------------------
