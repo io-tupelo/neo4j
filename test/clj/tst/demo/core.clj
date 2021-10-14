@@ -1,7 +1,7 @@
 (ns tst.demo.core
   (:use tupelo.core tupelo.test)
   (:require
-    [tupelo.config :as config]
+    [tst.config :as config]
     [tupelo.neo4j :as neo4j]
     [tupelo.string :as str]
     ))

@@ -2,7 +2,7 @@
   (:use tupelo.core tupelo.test)
   (:require
     [schema.core :as s]
-    [tupelo.config :as config]
+    [tst.config :as config]
     [tupelo.neo4j :as neo4j]
     [tupelo.string :as str]
     [tupelo.schema :as tsk]))

@@ -1,4 +1,4 @@
-(ns tupelo.config
+(ns tst.config
   (:use tupelo.core)
   (:require
     [environ.core :as environ]
