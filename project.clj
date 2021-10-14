@@ -1,4 +1,4 @@
-(defproject io-tupelo/neo4j "21.10.13-alpha1"
+(defproject io.tupelo/neo4j "21.10.13-alpha1"
   :dependencies      [
                       [clj-time "0.15.2"]
                       [environ "1.2.0"]
